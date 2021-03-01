@@ -118,9 +118,16 @@ const Backdrop = styled.div`
   color: #fff;
 `;
 
-const Modal = ({ show, onClose, children, ...otherProps }) => {
+const Modal = ({ show, onClose, children, effectState, ...otherProps }) => {
   return show ? (
-    <Backdrop {...otherProps} onClick={() => onClose()}>
+    <Backdrop
+      css={css`
+        ${fadeInOut.default(1000)}
+        ${fadeInOut[effectState]}
+      `}
+      {...otherProps}
+      onClick={() => onClose()}
+    >
       {children}
     </Backdrop>
   ) : null;
@@ -130,7 +137,7 @@ const Card = styled.div`
   width: 300px;
   height: 300px;
   border: 1px solid #fff;
-  ${scaleUpDown.default(300)}
+  ${scaleUpDown.default(1000)}
   ${({ effectState }) => scaleUpDown[effectState]}
 `;
 console.log(Card);
@@ -167,7 +174,11 @@ export default function App() {
         onExited={(node) => (node.ontransitionend = showModal.setOff)}
       >
         {(state) => (
-          <Modal show={showModal.on} onClose={modalEffect.setOff}>
+          <Modal
+            show={showModal.on}
+            onClose={modalEffect.setOff}
+            effectState={state}
+          >
             <Card effectState={state}>modal</Card>
           </Modal>
         )}
