@@ -53,3 +53,13 @@ export const slideInOut = {
     };
   }
 };
+
+// scaleUp
+
+export const scaleUpDown = {
+  default: (duration) => `transition : transform ${duration}ms;`,
+  entering: "transition:none; transform: scale(0);",
+  entered: "transform: scale(1);",
+  exiting: "transform: scale(1);",
+  exited: "transform: scale(0);"
+};

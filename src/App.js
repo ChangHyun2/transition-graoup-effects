@@ -1,13 +1,24 @@
 /** @jsx jsx */
 
 import "./styles.css";
-import { fadeInOut, slideInOut } from "./effects";
+import { fadeInOut, slideInOut, scaleUpDown } from "./effects";
 import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import { css, jsx } from "@emotion/react";
 import { TransitionGroup, Transition } from "react-transition-group";
 import uuid from "uuid";
 import "./styles.css";
+
+const useToggle = () => {
+  const [on, setOnState] = useState(false);
+
+  return {
+    on,
+    toggle: (prev) => setOnState(!prev),
+    setOff: () => setOnState(false),
+    setOn: () => setOnState(true)
+  };
+};
 
 const AddItem = ({ setItems }) => {
   const [text, setText] = useState("");
@@ -97,8 +108,39 @@ const ItemsFrom = ({ direction }) => {
   );
 };
 
+const Backdrop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000;
+  color: #fff;
+`;
+
+const Modal = ({ show, onClose, children, ...otherProps }) => {
+  return show ? (
+    <Backdrop {...otherProps} onClick={() => onClose()}>
+      {children}
+    </Backdrop>
+  ) : null;
+};
+
+const Card = styled.div`
+  width: 300px;
+  height: 300px;
+  border: 1px solid #fff;
+  ${scaleUpDown.default(300)}
+  ${({ effectState }) => scaleUpDown[effectState]}
+`;
+console.log(Card);
+
 export default function App() {
   const [inProp, setInProp] = useState(false);
+
+  const showModal = useToggle(false);
+  const modalEffect = useToggle(true);
+
   return (
     <div className="App">
       <Transition in={inProp}>
@@ -120,6 +162,24 @@ export default function App() {
       <ItemsFrom direction="right" />
       <ItemsFrom direction="top" />
       <ItemsFrom direction="bottom" />
+      <Transition
+        in={modalEffect.on}
+        onExited={(node) => (node.ontransitionend = showModal.setOff)}
+      >
+        {(state) => (
+          <Modal show={showModal.on} onClose={modalEffect.setOff}>
+            <Card effectState={state}>modal</Card>
+          </Modal>
+        )}
+      </Transition>
+      <button
+        onClick={() => {
+          modalEffect.setOn();
+          showModal.setOn();
+        }}
+      >
+        modal
+      </button>
     </div>
   );
 }
